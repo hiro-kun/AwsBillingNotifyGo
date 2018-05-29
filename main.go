@@ -3,10 +3,14 @@ package main
 import (
   "fmt"
 
-  // "github.com/aws/aws-sdk-go"
   "github.com/kelseyhightower/envconfig"
 
   "github.com/hiro-kun/AwsBillingNotifyGo/conf"
+  "github.com/hiro-kun/AwsBillingNotifyGo/aws"
+)
+
+const (
+	dimensionValue = "USD"
 )
 
 func main() {
@@ -16,5 +20,6 @@ func main() {
     fmt.Println(err)
   }
 
-  // fmt.Println(config.AWS_ACCESS_KEY)
+	billing := aws.GetBilling()
+	fmt.Printf("%v %v\n", dimensionValue, billing)
 }
