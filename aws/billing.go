@@ -21,8 +21,8 @@ func GetBilling() float64 {
 	params := &cloudwatch.GetMetricStatisticsInput{
 		Namespace:  aws.String(conf.Namespace),
 		MetricName: aws.String(conf.MetricName),
-		Period:     aws.Int64(21600),
-		StartTime:  aws.Time(time.Now().Add(time.Duration(21600) * time.Second * -1)),
+    Period:     aws.Int64(21600),
+    StartTime:  aws.Time(time.Now().Add(time.Duration(43200) * time.Second * -1)),
 		EndTime:    aws.Time(time.Now()),
 		Statistics: []*string{
 			aws.String(cloudwatch.StatisticMaximum),
