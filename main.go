@@ -1,5 +1,8 @@
 package main
 
+// 設置場所
+// $GOPATH/src/github.com/hiro-kun/AwsBillingNotifyGo
+
 import (
   "fmt"
 
@@ -26,7 +29,7 @@ func main() {
 
   accessToken := config.LINE_NOTIFY_API_TOKEN
 
-  URL := "https://notify-api.line.me/api/notify"
+  URL := conf.LineEndPointURL
 
   u, err := url.ParseRequestURI(URL)
   if err != nil {
