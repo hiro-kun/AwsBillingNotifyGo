@@ -9,10 +9,6 @@ import (
   "github.com/hiro-kun/AwsBillingNotifyGo/aws"
 )
 
-const (
-	dimensionValue = "USD"
-)
-
 func main() {
   var config conf.Config
   err := envconfig.Process("", &config)
@@ -21,5 +17,5 @@ func main() {
   }
 
 	billing := aws.GetBilling()
-	fmt.Printf("%v %v\n", dimensionValue, billing)
+	fmt.Printf("%v %v\n", conf.DimensionValue, billing)
 }
