@@ -10,9 +10,18 @@ import(
   "github.com/hiro-kun/AwsBillingNotifyGo/conf"
 )
 
-func ApiCall(msg string, config *conf.Config) {
+type LineApi struct {
+  Msg     string
+  Config  *conf.Config
+}
 
-  accessToken := config.LINE_NOTIFY_API_TOKEN
+func (l LineApi) Greet() string {
+  return "hello";
+}
+
+func ApiCall(l *LineApi) {
+
+  accessToken := l.Config.LINE_NOTIFY_API_TOKEN
 
   URL := conf.LineEndPointURL
 
@@ -24,7 +33,7 @@ func ApiCall(msg string, config *conf.Config) {
   c := &http.Client{}
 
   form := url.Values{}
-  form.Add("message", msg)
+  form.Add("message", l.Msg)
 
   body := strings.NewReader(form.Encode())
 

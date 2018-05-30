@@ -24,5 +24,8 @@ func main() {
 	billing := aws.GetBilling()
 	msg := fmt.Sprintf("%v %v\n", conf.DimensionValue, billing)
 
-  line.ApiCall(msg, &config)
+  line.ApiCall(&line.LineApi{
+    Msg:    msg,
+    Config: &config,
+  })
 }
