@@ -15,11 +15,7 @@ type LineApi struct {
   Config  *conf.Config
 }
 
-func (l LineApi) Greet() string {
-  return "hello";
-}
-
-func ApiCall(l *LineApi) {
+func MessageApiCall(l *LineApi) {
 
   accessToken := l.Config.LINE_NOTIFY_API_TOKEN
 
