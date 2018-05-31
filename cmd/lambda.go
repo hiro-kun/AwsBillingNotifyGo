@@ -7,13 +7,22 @@ import (
   "fmt"
 
   "github.com/kelseyhightower/envconfig"
+  "github.com/aws/aws-lambda-go/lambda"
 
   "github.com/hiro-kun/AwsBillingNotifyGo/conf"
   "github.com/hiro-kun/AwsBillingNotifyGo/aws"
   "github.com/hiro-kun/AwsBillingNotifyGo/line"
 )
 
-func main() {
+type Event struct {}
+
+type Response struct {
+  Message string
+}
+
+func call(event Event) (Response, error) {
+
+  fmt.Println("=== lambda start. ===")
 
   var config conf.Config
   err := envconfig.Process("", &config)
@@ -21,11 +30,17 @@ func main() {
     fmt.Println(err)
   }
 
-	billing := aws.GetBilling()
-	msg := fmt.Sprintf("%v %v\n", conf.DimensionValue, billing)
+  billing := aws.GetBilling()
+  msg := fmt.Sprintf("%v %v\n", conf.DimensionValue, billing)
 
-  line.ApiCall(&line.LineApi{
+  line.MessageApiCall(&line.LineApi{
     Msg:    msg,
     Config: &config,
   })
+
+  return Response{Message: "=== lambda end. ==="}, nil
+}
+
+func main() {
+  lambda.Start(call)
 }
