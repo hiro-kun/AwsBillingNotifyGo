@@ -15,7 +15,7 @@ type LineApi struct {
   Config  *conf.Config
 }
 
-func MessageApiCall(l *LineApi) {
+func MessageApiCall(l *LineApi) (int, error) {
 
   accessToken := l.Config.LINE_NOTIFY_API_TOKEN
 
@@ -23,7 +23,7 @@ func MessageApiCall(l *LineApi) {
 
   u, err := url.ParseRequestURI(URL)
   if err != nil {
-    fmt.Println(err)
+    return conf.ExitCodeError, fmt.Errorf("url parse error : %s", err)
   }
 
   c := &http.Client{}
@@ -35,7 +35,7 @@ func MessageApiCall(l *LineApi) {
 
   req, err := http.NewRequest("POST", u.String(), body)
   if err != nil {
-    fmt.Println(err)
+    return conf.ExitCodeError, fmt.Errorf("api request error : %s", err)
   }
 
   req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -43,6 +43,8 @@ func MessageApiCall(l *LineApi) {
 
   _, err = c.Do(req)
   if err != nil {
-    fmt.Println(err)
+    return conf.ExitCodeError, fmt.Errorf("api call error : %s", err)
   }
+
+  return conf.ExitCodeOk, nil
 }

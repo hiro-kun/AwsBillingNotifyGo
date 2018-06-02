@@ -2,6 +2,7 @@ package aws
 
 import (
   "time"
+  "fmt"
 
   "github.com/aws/aws-sdk-go/aws"
   "github.com/aws/aws-sdk-go/aws/session"
@@ -10,10 +11,12 @@ import (
   "github.com/hiro-kun/AwsBillingNotifyGo/conf"
 )
 
-func GetBilling() float64 {
+func GetBilling() (float64, int, error) {
+  var metrics float64
+
 	sess, err := session.NewSession(&aws.Config{Region: aws.String(conf.Region)})
 	if err != nil {
-		panic(err)
+		return metrics, conf.ExitCodeError, fmt.Errorf("session create error : %s", err)
 	}
 
 	svc := cloudwatch.New(sess)
@@ -38,8 +41,8 @@ func GetBilling() float64 {
 
 	resp, err := svc.GetMetricStatistics(params)
 	if err != nil {
-		panic(err)
+		return metrics, conf.ExitCodeError, fmt.Errorf("get metrics error : %s", err)
 	}
 
-	return float64(*resp.Datapoints[0].Maximum)
+	return float64(*resp.Datapoints[0].Maximum), conf.ExitCodeOk, nil
 }
