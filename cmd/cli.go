@@ -30,16 +30,19 @@ func run() (int, error) {
     return conf.ExitCodeError, err
   }
 
-	billingInfo, _, err := aws.GetBilling()
+	billingInfo, err := aws.GetBilling()
   if err != nil {
     return conf.ExitCodeError, err
   }
-	msg := fmt.Sprintf(" 想定金額: %v %v\n 請求金額作成日 %v ", conf.DimensionValue, billingInfo["estimatePrice"], billingInfo["timestamp"])
+	msg := fmt.Sprintf(" \n 想定金額: %v %v\n 想定金額確定日: %v ", conf.DimensionValue, billingInfo["estimatePrice"], billingInfo["timestamp"])
 
-  line.MessageApiCall(&line.LineApi{
+  err = line.MessageApiCall(&line.LineApi{
     Msg:    msg,
     Config: &config,
   })
+  if err != nil {
+    return conf.ExitCodeError, err
+  }
 
   return conf.ExitCodeOk, nil
 }

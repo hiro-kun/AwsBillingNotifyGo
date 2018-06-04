@@ -4,8 +4,6 @@ import (
   "time"
   "fmt"
 
-  // "reflect"
-
   "github.com/aws/aws-sdk-go/aws"
   "github.com/aws/aws-sdk-go/aws/session"
   "github.com/aws/aws-sdk-go/service/cloudwatch"
@@ -13,13 +11,12 @@ import (
   "github.com/hiro-kun/AwsBillingNotifyGo/conf"
 )
 
-// func GetBilling() (float64, int, error) {
-func GetBilling() (map[string]interface{}, int, error) {
+func GetBilling() (map[string]interface{}, error) {
   estimatedCharges := make(map[string]interface{})
 
 	sess, err := session.NewSession(&aws.Config{Region: aws.String(conf.Region)})
 	if err != nil {
-		return estimatedCharges, conf.ExitCodeError, fmt.Errorf("session create error : %s", err)
+		return estimatedCharges, fmt.Errorf("session create error : %s", err)
 	}
 	svc := cloudwatch.New(sess)
 
@@ -45,7 +42,7 @@ func GetBilling() (map[string]interface{}, int, error) {
 
 	resp, err := svc.GetMetricStatistics(params)
 	if err != nil {
-		return estimatedCharges, conf.ExitCodeError, fmt.Errorf("get metrics error : %s", err)
+		return estimatedCharges, fmt.Errorf("get metrics error : %s", err)
 	}
 
   tmpMaximum := 0.0
@@ -62,5 +59,5 @@ func GetBilling() (map[string]interface{}, int, error) {
   estimatedCharges["estimatePrice"] = tmpMaximum
   estimatedCharges["timestamp"] = tmpTimeStamp
 
-  return estimatedCharges, conf.ExitCodeOk, nil
+  return estimatedCharges, nil
 }
