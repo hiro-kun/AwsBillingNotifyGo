@@ -20,25 +20,38 @@ type Response struct {
   Message string
 }
 
-func call(event Event) (Response, error) {
-
-  fmt.Println("=== lambda start. ===")
-
+func run() error {
   var config conf.Config
   err := envconfig.Process("", &config)
   if err != nil {
-    fmt.Println(err)
+    return err
   }
 
-  billing := aws.GetBilling()
-  msg := fmt.Sprintf("%v %v\n", conf.DimensionValue, billing)
+	billingInfo, err := aws.GetBilling()
+  if err != nil {
+    return err
+  }
+	msg := fmt.Sprintf(" \n 想定金額: %v %v\n 想定金額確定日: %v ", conf.DimensionValue, billingInfo["estimatePrice"], billingInfo["timestamp"])
 
-  line.MessageApiCall(&line.LineApi{
+  err = line.MessageApiCall(&line.LineApi{
     Msg:    msg,
     Config: &config,
   })
+  if err != nil {
+    return err
+  }
 
-  return Response{Message: "=== lambda end. ==="}, nil
+  return nil
+}
+
+func call(event Event) (Response, error) {
+
+  err := run()
+  if err != nil {
+    return Response{Message: err.Error()}, nil
+  }
+
+  return Response{Message: "lambda end success."}, nil
 }
 
 func main() {
