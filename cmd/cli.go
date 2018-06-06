@@ -4,43 +4,43 @@ package main
 // $GOPATH/src/github.com/hiro-kun/AwsBillingNotifyGo
 
 import (
-  "fmt"
-  "os"
+	"fmt"
+	"os"
 
-  "github.com/kelseyhightower/envconfig"
+	"github.com/kelseyhightower/envconfig"
 
-  "github.com/hiro-kun/AwsBillingNotifyGo/conf"
-  "github.com/hiro-kun/AwsBillingNotifyGo/aws"
-  "github.com/hiro-kun/AwsBillingNotifyGo/line"
+	"github.com/hiro-kun/AwsBillingNotifyGo/aws"
+	"github.com/hiro-kun/AwsBillingNotifyGo/conf"
+	"github.com/hiro-kun/AwsBillingNotifyGo/line"
 )
 
 func main() {
 
-  exitCode, err := run()
-  if err != nil {
-    fmt.Println(err)
-  }
-  os.Exit(exitCode)
+	exitCode, err := run()
+	if err != nil {
+		fmt.Println(err)
+	}
+	os.Exit(exitCode)
 }
 
 func run() (int, error) {
-  var config conf.Config
-  err := envconfig.Process("", &config)
-  if err != nil {
-    return conf.ExitCodeError, err
-  }
+	var config conf.Config
+	err := envconfig.Process("", &config)
+	if err != nil {
+		return conf.ExitCodeError, err
+	}
 
 	billingInfo, err := aws.GetBilling()
-  if err != nil {
-    return conf.ExitCodeError, err
-  }
+	if err != nil {
+		return conf.ExitCodeError, err
+	}
 	msg := fmt.Sprintf(" \n 想定金額: %v %v\n 想定金額確定日: %v ", conf.DimensionValue, billingInfo["estimatePrice"], billingInfo["timestamp"])
 
-  lineApi := line.NewLineApi(msg, &config, config.LINE_NOTIFY_API_TOKEN)
-  err = lineApi.MessageApiCall()
-  if err != nil {
-    return conf.ExitCodeError, err
-  }
+	lineApi := line.NewLineApi(msg, &config, config.LINE_NOTIFY_API_TOKEN)
+	err = lineApi.MessageApiCall()
+	if err != nil {
+		return conf.ExitCodeError, err
+	}
 
-  return conf.ExitCodeOk, nil
+	return conf.ExitCodeOk, nil
 }
