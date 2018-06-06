@@ -13,11 +13,20 @@ import(
 type LineApi struct {
   Msg     string
   Config  *conf.Config
+  Token   string
 }
 
-func MessageApiCall(l *LineApi) (error) {
+func NewLineApi(msg string, config *conf.Config, token string) *LineApi {
+    return &LineApi{
+        Msg:    msg,
+        Config: config,
+        Token:  token,
+    }
+}
 
-  accessToken := l.Config.LINE_NOTIFY_API_TOKEN
+func (l *LineApi) MessageApiCall() (error) {
+
+  accessToken := l.Token
 
   URL := conf.LineEndPointURL
 
