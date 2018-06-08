@@ -33,10 +33,8 @@ func run() error {
 	}
 	msg := fmt.Sprintf(" \n 想定金額: %v %v\n 想定金額確定日: %v ", conf.DimensionValue, billingInfo["estimatePrice"], billingInfo["timestamp"])
 
-	err = line.MessageApiCall(&line.LineApi{
-		Msg:    msg,
-		Config: &config,
-	})
+	lineApi := line.NewLineApi(msg, &config, config.LINE_NOTIFY_API_TOKEN)
+	err = lineApi.MessageApiCall()
 	if err != nil {
 		return err
 	}
