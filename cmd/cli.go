@@ -4,28 +4,43 @@ package main
 // $GOPATH/src/github.com/hiro-kun/AwsBillingNotifyGo
 
 import (
-  "fmt"
+	"fmt"
+	"os"
 
-  "github.com/kelseyhightower/envconfig"
+	"github.com/kelseyhightower/envconfig"
 
-  "github.com/hiro-kun/AwsBillingNotifyGo/conf"
-  "github.com/hiro-kun/AwsBillingNotifyGo/aws"
-  "github.com/hiro-kun/AwsBillingNotifyGo/line"
+	"github.com/hiro-kun/AwsBillingNotifyGo/aws"
+	"github.com/hiro-kun/AwsBillingNotifyGo/conf"
+	"github.com/hiro-kun/AwsBillingNotifyGo/line"
 )
 
 func main() {
 
-  var config conf.Config
-  err := envconfig.Process("", &config)
-  if err != nil {
-    fmt.Println(err)
-  }
+	exitCode, err := run()
+	if err != nil {
+		fmt.Println(err)
+	}
+	os.Exit(exitCode)
+}
 
-	billing := aws.GetBilling()
-	msg := fmt.Sprintf("%v %v\n", conf.DimensionValue, billing)
+func run() (int, error) {
+	var config conf.Config
+	err := envconfig.Process("", &config)
+	if err != nil {
+		return conf.ExitCodeError, err
+	}
 
-  line.MessageApiCall(&line.LineApi{
-    Msg:    msg,
-    Config: &config,
-  })
+	billingInfo, err := aws.GetBilling()
+	if err != nil {
+		return conf.ExitCodeError, err
+	}
+	msg := fmt.Sprintf(" \n 想定金額: %v %v\n 想定金額確定日: %v ", conf.DimensionValue, billingInfo["estimatePrice"], billingInfo["timestamp"])
+
+	lineApi := line.NewLineApi(msg, &config, config.LINE_NOTIFY_API_TOKEN)
+	err = lineApi.MessageApiCall()
+	if err != nil {
+		return conf.ExitCodeError, err
+	}
+
+	return conf.ExitCodeOk, nil
 }

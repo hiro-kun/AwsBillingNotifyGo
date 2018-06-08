@@ -1,48 +1,59 @@
 package line
 
-import(
-  "fmt"
+import (
+	"fmt"
 
-  "net/http"
-  "net/url"
-  "strings"
+	"net/http"
+	"net/url"
+	"strings"
 
-  "github.com/hiro-kun/AwsBillingNotifyGo/conf"
+	"github.com/hiro-kun/AwsBillingNotifyGo/conf"
 )
 
 type LineApi struct {
-  Msg     string
-  Config  *conf.Config
+	Msg    string
+	Config *conf.Config
+	Token  string
 }
 
-func MessageApiCall(l *LineApi) {
+func NewLineApi(msg string, config *conf.Config, token string) *LineApi {
+	return &LineApi{
+		Msg:    msg,
+		Config: config,
+		Token:  token,
+	}
+}
 
-  accessToken := l.Config.LINE_NOTIFY_API_TOKEN
+func (l *LineApi) MessageApiCall() error {
 
-  URL := conf.LineEndPointURL
+	accessToken := l.Token
 
-  u, err := url.ParseRequestURI(URL)
-  if err != nil {
-    fmt.Println(err)
-  }
+	URL := conf.LineEndPointURL
 
-  c := &http.Client{}
+	u, err := url.ParseRequestURI(URL)
+	if err != nil {
+		return fmt.Errorf("url parse error : %s", err)
+	}
 
-  form := url.Values{}
-  form.Add("message", l.Msg)
+	c := &http.Client{}
 
-  body := strings.NewReader(form.Encode())
+	form := url.Values{}
+	form.Add("message", l.Msg)
 
-  req, err := http.NewRequest("POST", u.String(), body)
-  if err != nil {
-    fmt.Println(err)
-  }
+	body := strings.NewReader(form.Encode())
 
-  req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-  req.Header.Set("Authorization", "Bearer "+accessToken)
+	req, err := http.NewRequest("POST", u.String(), body)
+	if err != nil {
+		return fmt.Errorf("api request error : %s", err)
+	}
 
-  _, err = c.Do(req)
-  if err != nil {
-    fmt.Println(err)
-  }
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+
+	_, err = c.Do(req)
+	if err != nil {
+		return fmt.Errorf("api call error : %s", err)
+	}
+
+	return nil
 }
